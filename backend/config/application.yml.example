@@ -1,0 +1,8 @@
+# Helyi, titkos beállítások. Másold le "application.yml" néven ebbe a mappába (backend/config/).
+# A Spring Boot induláskor automatikusan beolvassa, és felülírja vele az alap beállításokat.
+# A backend/config/application.yml NINCS verziókezelve (.gitignore), ide jöhet a Client secret.
+portal:
+  jira:
+    oauth:
+      client-id: "IDE_A_CLIENT_ID"
+      client-secret: "IDE_A_CLIENT_SECRET"

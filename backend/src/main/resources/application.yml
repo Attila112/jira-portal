@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: jira-portal
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 8h
+      cookie:
+        name: PORTAL_SESSION
+        http-only: true
+        # lax: a Jira OAuth visszairányításakor (más oldalról érkező GET) is megjön a cookie
+        same-site: lax
+        # Élesben (HTTPS mögött) COOKIE_SECURE=true legyen.
+        secure: ${COOKIE_SECURE:false}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+portal:
+  data-dir: ${PORTAL_DATA_DIR:./data}
+  cookie-secure: ${COOKIE_SECURE:false}
+  # Belépés után ide irányítunk vissza. Fejlesztéskor a Vite: http://localhost:5173, élesben üres.
+  frontend-url: ${PORTAL_FRONTEND_URL:}
+  # Felhasználónév + jelszó belépés engedélyezése (a Belépés Jirával mellett).
+  password-login: ${PORTAL_PASSWORD_LOGIN:true}
+  # Opcionális PostgreSQL (pl. Neon) a szabadságokhoz és mentett személyekhez. Üresen: helyi data mappa.
+  # A Neon "postgresql://user:pass@host/db?sslmode=require" címe közvetlenül bemásolható.
+  database:
+    url: ${PORTAL_DB_URL:}
+    username: ${PORTAL_DB_USER:}
+    password: ${PORTAL_DB_PASSWORD:}
+  jira:
+    base-url: ${JIRA_URL:https://servicedesk.bnref.hu}
+    # session = a Jira munkamenet-cookie-ját tároljuk (a jelszót nem); basic = jelszó a szerver memóriájában
+    auth-mode: ${JIRA_AUTH_MODE:session}
+    # Céges (belső CA-s) tanúsítványhoz Windows-on: Windows-ROOT. Üresen a JDK saját tára.
+    trust-store-type: ${JIRA_TRUST_STORE_TYPE:}
+    trust-store: ${JIRA_TRUST_STORE:}
+    trust-store-password: ${JIRA_TRUST_STORE_PASSWORD:}
+    # "Belépés Jirával" (céges SSO a Jirán keresztül). Client ID/secret: Jira -> Application links (bejövő, OAuth 2.0).
+    # A titkot NE ide írd: backend/config/application.yml (nincs verziókezelve) vagy környezeti változó.
+    oauth:
+      client-id: ${JIRA_OAUTH_CLIENT_ID:}
+      client-secret: ${JIRA_OAUTH_CLIENT_SECRET:}
+      redirect-uri: ${JIRA_OAUTH_REDIRECT_URI:http://localhost:8080/login/oauth2/code/jira}
+      scope: READ
+      # PKCE (S256). Ha a Jira token végpontja 500-at ad vele, maradjon false (a client secret véd).
+      pkce: ${JIRA_OAUTH_PKCE:false}
+    connect-timeout: 10s
+    read-timeout: 180s
+  worklog:
+    zone: Europe/Budapest
+    hours-per-day: 8
+    # authored = minden issue, amire a felhasználó logolt; assigned = a régi worklogReport logikája
+    scope: ${WORKLOG_SCOPE:authored}
+    project-presets:
+      - label: Összes projekt
+        projects: ""
+      - label: AJI
+        projects: AJI
+      - label: BNSD
+        projects: BNSD
+      - label: AJI + BNSD
+        projects: AJI,BNSD
+    # Hétköznapra eső munkaszüneti napok (YYYY-MM-DD). Ezek nem számítanak bele a havi keretbe és az átlagba.
+    holidays: []
+    # Áthelyezett szombati munkanapok (YYYY-MM-DD).
+    extra-workdays: []
+
+logging:
+  level:
+    hu.bplusn.portal: INFO

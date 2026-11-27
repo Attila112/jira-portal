@@ -1,0 +1,15 @@
+#!/bin/sh
+# Egyszerű Maven wrapper (Linux/macOS): első futáskor letölti a Mavent a ~/.m2/wrapper mappába.
+set -e
+MVN_VER=3.9.11
+MVN_BASE="$HOME/.m2/wrapper"
+MVN_HOME="$MVN_BASE/apache-maven-$MVN_VER"
+if [ ! -x "$MVN_HOME/bin/mvn" ]; then
+  echo "Maven $MVN_VER letöltése ide: $MVN_BASE"
+  mkdir -p "$MVN_BASE"
+  TMP_ZIP="$(mktemp)"
+  curl -fsSL "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MVN_VER/apache-maven-$MVN_VER-bin.tar.gz" -o "$TMP_ZIP"
+  tar -xzf "$TMP_ZIP" -C "$MVN_BASE"
+  rm -f "$TMP_ZIP"
+fi
+exec "$MVN_HOME/bin/mvn" "$@"

@@ -1,0 +1,5 @@
+# Windows parancsfájlok CRLF, a shell scriptek LF sorvéggel maradjanak (bármilyen git-beállításnál)
+*.cmd text eol=crlf
+*.bat text eol=crlf
+backend/mvnw text eol=lf
+*.sh text eol=lf

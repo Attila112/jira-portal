@@ -1,0 +1,32 @@
+# Render Blueprint: Render -> New -> Blueprint -> ez a repó.
+# A "sync: false" értékeket a Render a létrehozáskor bekéri (titkok, nem kerülnek a repóba).
+services:
+  - type: web
+    name: jira-portal
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: JIRA_URL
+        value: https://servicedesk.bnref.hu
+      # HTTPS mögött: biztonságos cookie, és a Render proxy fejléceinek figyelembe vétele (https átirányítások)
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: SERVER_FORWARD_HEADERS_STRATEGY
+        value: framework
+      # Nyilvános címen csak a Belépés Jirával (SSO) legyen engedélyezve
+      - key: PORTAL_PASSWORD_LOGIN
+        value: "false"
+      - key: JIRA_OAUTH_CLIENT_ID
+        sync: false
+      - key: JIRA_OAUTH_CLIENT_SECRET
+        sync: false
+      # pl. https://jira-portal.onrender.com/login/oauth2/code/jira (a Jira Application Linkkel egyezzen!)
+      - key: JIRA_OAUTH_REDIRECT_URI
+        sync: false
+      # Neon connection string: postgresql://user:pass@host/db?sslmode=require
+      - key: PORTAL_DB_URL
+        sync: false
